@@ -3,7 +3,7 @@ const reviewModel = require("../Models/reviewModel");
 
 const validator = require("validator");
 const bookModel = require("../Models/bookModel");
-let validReview = /^[a-z , A-Z0-9_]+$/
+
 const createReview = async function(req,res){
     try{
     let data = req.body
@@ -17,6 +17,11 @@ const createReview = async function(req,res){
 
     if(data.bookId!=bookId) return res.status(400).send({status:false,mesage:"params bookId and body's book id is not same"})
     data.isDeleted =  false
+
+    if(data.reviewedAt){
+        if(!validator.isDate(data.reviewedAt)) return res.status(400).send({status:false,message:"Invalid date or formate,plz send date in this formate (YYYY/MM/DD) "})
+    }
+
     if(!data.reviewedAt){
         data.reviewedAt=Date.now()
     }
@@ -41,7 +46,6 @@ const createReview = async function(req,res){
      if(typeof rating!="number") return res.status(400).send ({status:false,mesage:"invalid rating / rating must be innumber"})
      
      if(review){
-
          if(validator.isAlphanumeric(review))  return res.status(400).send ({status:false,message:"review is invalid"})
      }
     
