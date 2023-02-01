@@ -23,6 +23,8 @@
   "homepage": "https://github.com/Ashish-Rayalwar/Project-4-BookManagement#readme",
   "dependencies": {
     "aws-sdk": "^2.1305.0",
+    "bcrypt": "^5.1.0",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",

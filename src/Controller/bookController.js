@@ -14,14 +14,14 @@ let validateTitle = /^[^0-9][a-z , A-Z0-9_ ? @ ! $ % & * : ]+$/;
 const createBook = async (req, res) => {
   try {
     let data = req.body;
-    let files = req.files;
+    // let files = req.files;
 
-    let uploadedFileURL;
-    if (files && files.length > 0) {
-      uploadedFileURL = await uploadFile(files[0]);
-    } else {
-      return res.status(400).send({ msg: "No file found" });
-    }
+    // let uploadedFileURL;
+    // if (files && files.length > 0) {
+    //   uploadedFileURL = await uploadFile(files[0]);
+    // } else {
+    //   return res.status(400).send({ msg: "No file found" });
+    // }
 
     if (Object.keys(data).length === 0)
       return res
@@ -107,6 +107,14 @@ const createBook = async (req, res) => {
         .status(400)
         .send({ status: false, message: "plz enter valid name" });
 
+    if(!releasedAt) return res
+    .status(400)
+    .send({
+      status: false,
+      message:
+        " releasedAt is mandatory,plz send date in this formate (YYYY/MM/DD) ",
+    });
+
     if (!validator.isDate(releasedAt))
       return res
         .status(400)
@@ -137,8 +145,8 @@ const createBook = async (req, res) => {
       category,
       subcategory,
       reviews: 0,
-      releasedAt: Date.now(),
-      bookCover: uploadedFileURL,
+      releasedAt: Date.now()
+    //   bookCover: uploadedFileURL,
     }; //bookCover:uploadedFileURL
     let createBook = await bookModel.create(bookData);
 
