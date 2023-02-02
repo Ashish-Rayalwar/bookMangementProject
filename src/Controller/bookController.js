@@ -4,9 +4,9 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const userModel = require("../Models/userModel");
 const reviewModel = require("../Models/reviewModel");
-const { findOneAndUpdate } = require("../Models/userModel");
-const aws = require("aws-sdk");
-const { uploadFile } = require("./aws");
+// const { findOneAndUpdate } = require("../Models/userModel");
+// const aws = require("aws-sdk");
+// const { uploadFile } = require("./aws");
 
 let isbnRegex = /^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/;
 let validateTitle = /^[^0-9][a-z , A-Z0-9_ ? @ ! $ % & * : ]+$/;
@@ -20,7 +20,7 @@ const createBook = async (req, res) => {
     // if (files && files.length > 0) {
     //   uploadedFileURL = await uploadFile(files[0]);
     // } else {
-    //   return res.status(400).send({ msg: "No file found" });
+    //   return res.status(400).send({ message: "No file found" });
     // }
 
     if (Object.keys(data).length === 0)
@@ -146,13 +146,13 @@ const createBook = async (req, res) => {
       subcategory,
       reviews: 0,
       releasedAt: Date.now()
-    //   bookCover: uploadedFileURL,
+      // bookCover: uploadedFileURL
     }; //bookCover:uploadedFileURL
     let createBook = await bookModel.create(bookData);
 
     let { __v, ...otherData } = createBook._doc;
 
-    res.status(201).send({ status: true, data: otherData });
+    res.status(201).send({ status: true, message:"Success", data: otherData });
   } catch (error) {
     console.log("error in create book", error.message);
     res.send(error.message);
@@ -171,10 +171,7 @@ const getBooks = async (req, res) => {
     data.isDeleted = false;
 
     if (keys.length === 0) {
-      let getAllBooks = await bookModel
-        .find({ isDeleted: false })
-        .sort({ title: 1 })
-        .select({
+      let getAllBooks = await bookModel.find({ isDeleted: false }).sort({ title: 1 }).select({
           ISBN: 0,
           subcategory: 0,
           isDeleted: 0,
@@ -182,18 +179,11 @@ const getBooks = async (req, res) => {
           updatedAt: 0,
           __v: 0,
         });
-      if (getAllBooks.length === 0)
-        return res
-          .status(404)
-          .send({ status: false, message: "books not found" });
-      let lengthOfAllbooks = getAllBooks.length;
-      return res
-        .status(200)
-        .send({
-          status: true,
-          TotalBooks: lengthOfAllbooks,
-          data: getAllBooks,
-        });
+
+      if (getAllBooks.length === 0)return res.status(404).send({ status: false, message: "books not found" });
+      // let lengthOfAllbooks = getAllBooks.length;
+      return res.status(200).send({status: true,message:"Success",data: getAllBooks})
+    
     }
 
     if (keys.includes("userId")) {
@@ -227,10 +217,10 @@ const getBooks = async (req, res) => {
         .status(404)
         .send({ status: false, message: "books not found" });
 
-    res.status(200).send({ status: true, data: getBooks });
+    res.status(200).send({ status: true,message:"Success", data: getBooks });
   } catch (error) {
     console.log("error in getBooks", error.message);
-    res.status(500).send({ message: error.message });
+    res.status(500).send({ status:false, message: error.message });
   }
 };
 
@@ -251,14 +241,10 @@ const getBookById = async function (req, res) {
       .lean();
     if (!bookData) return res.status(404).send({ message: "no book found" });
 
-    let booksReviews = await reviewModel
-      .find({ bookId: bookId, isDeleted: false })
-      .select({ createdAt: 0, updatedAt: 0, isDeleted: 0, __v: 0 });
+    let booksReviews = await reviewModel.find({ bookId: bookId, isDeleted: false }).select({ createdAt: 0, updatedAt: 0, isDeleted: 0, __v: 0 });
     bookData.booksReviews = booksReviews;
 
-    res
-      .status(200)
-      .send({ status: true, message: "Book List", data: bookData });
+    res.status(200).send({ status: true, message: "Book List", data: bookData });
   } catch (err) {
     res.status(500).send({ status: false, message: err.message });
   }
@@ -347,10 +333,10 @@ const updateBookById = async (req, res) => {
       return res.status(404).send({ status: false, message: "No books found" });
     }
 
-    return res.status(200).send({ status: true, data: updateData });
+    return res.status(200).send({ status: true, message:"Success", data: updateData });
   } catch (error) {
     console.log("error in updateBook", error.message);
-    res.status(500).send({ error: error.message });
+    res.status(500).send({ status:false, message: error.message });
   }
 };
 

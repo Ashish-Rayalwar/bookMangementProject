@@ -11,23 +11,27 @@ const bookModel = require("../Models/bookModel");
 
 const verifyToken = async (req,res,next)=>{
    
-    let token = req.headers["x-api-key"]
+    try {
+        let token = req.headers["x-api-key"]
 
-    if(!token) return res.status(400).send({status:false,msg:"Token is mandatory"})
+    if(!token) return res.status(400).send({status:false,message:"Token is mandatory"})
 
-    if(!validator.isJWT(token)) return res.status(400).send({status:false,msg:"Token is invalid"})
+    if(!validator.isJWT(token)) return res.status(400).send({status:false,message:"Token is invalid"})
 
     if(token){
 
     jwt.verify(token, "group2project-4",(err,tokenDetails)=>{
-        if(err) return res.status(403).send({status:false,msg:"Token is Invalid or expire"})
+        if(err) return res.status(403).send({status:false,message:"Token is Invalid or expire"})
 
        
         req.tokenDetails = tokenDetails
         next()
     })
     }else{
-        return res.status(401).send({status:false,msg:"you are not authenticated"})
+        return res.status(401).send({status:false,message:"you are not authenticated"})
+    }
+    } catch (error) {
+        res.status(500).send({status:false,messaage:error.message})
     }
    
 }
@@ -35,7 +39,8 @@ const verifyToken = async (req,res,next)=>{
 
 
 const verifyTokenAndAuthorization = async(req,res,next)=>{
-    verifyToken(req,res,async()=>{
+    try {
+        verifyToken(req,res,async()=>{
             if(!mongoose.isValidObjectId(req.params.bookId)) return res.status(400).send({status:false,message:"Invalid bookId"})
             let book = await bookModel.findById(req.params.bookId)
             if(!book) return res.status(404).send({status:false,message:"Book not found, plz check bookId"})
@@ -43,9 +48,12 @@ const verifyTokenAndAuthorization = async(req,res,next)=>{
         if(req.tokenDetails.userId === book.userId.toString()){
             next()
         }else{
-            res.status(403).send({msg:"you are not authorized to perform this task"})
+            res.status(403).send({message:"you are not authorized to perform this task"})
         }
     })
+    } catch (error) {
+        res.status(500).send({status:false,messaage:error.message})
+    }
 }
 
 

@@ -58,7 +58,7 @@ const createReview = async function (req, res) {
     if (!rating)
       return res
         .status(400)
-        .send({ status: false, mesage: "rating is required" });
+        .send({ status: false, message: "rating is required" });
 
     if (!(rating >= 1 && rating <= 5))
       return res
@@ -70,7 +70,7 @@ const createReview = async function (req, res) {
         .status(400)
         .send({
           status: false,
-          mesage: "invalid rating / rating must be innumber",
+          message: "invalid rating / rating must be innumber",
         });
 
     if (review) {
@@ -87,7 +87,7 @@ const createReview = async function (req, res) {
         { new: true }
       )
       .lean()
-      .select({ __v: 0 });
+      .select({ __v: 0,_id:0 });
     if (!book)
       return res.status(404).send({ status: false, message: "book not found" });
     let reviewData = {
@@ -137,17 +137,17 @@ const reviewUpdate = async function (req, res) {
         .send({ status: false, message: "rating should be inbetween 1 and 5" });
     if (rating) {
       if (typeof rating != "number") {
-        return res.status(400).send({ message: "Invalid value of rating" });
+        return res.status(400).send({status:false, message: "Invalid value of rating" });
       }
     }
     if (review) {
       if (typeof review != "string") {
-        return res.status(400).send({ message: "Invalid value of review" });
+        return res.status(400).send({status:false, message: "Invalid value of review" });
       }
     }
     if (reviewedBy) {
       if (typeof reviewedBy != "string") {
-        return res.status(400).send({ message: "Invalid value of reviewedBy" });
+        return res.status(400).send({status:false, message: "Invalid value of reviewedBy" });
       }
     }
     let book = await bookModel.findOne({ _id: bookId, isDeleted: false });
@@ -163,7 +163,7 @@ const reviewUpdate = async function (req, res) {
     if (!reviewId)
       return res
         .status(400)
-        .send({ status: false, message: " please enter rewiewId" });
+        .send({ status: false, message: "please enter rewiewId" });
 
     if (!mongoose.isValidObjectId(reviewId)) {
       return res
@@ -186,7 +186,7 @@ const reviewUpdate = async function (req, res) {
       data,
       { updatedAt: new Date(), new: true }
     );
-    return res.status(200).send({ status: true, message: savedData });
+    return res.status(200).send({ status: true, message:"Success",data:savedData });
   } catch (error) {
     console.log(error);
     return res.status(500).send({ status: false, message: error.message });

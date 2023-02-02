@@ -7,7 +7,7 @@ const registerUser = async (req, res) => {
     let data = req.body;
 
     if (Object.keys(data).length === 0)
-      return res.status(400).send({ message: "plz provide valid data" });
+      return res.status(400).send({status:false, message: "plz provide valid data" });
 
     let validateMobile = /^[6-9][0-9]{9}$/;
 
@@ -60,16 +60,16 @@ const registerUser = async (req, res) => {
         .status(400)
         .send({
           status: false,
-          mesage: "password must be greater than 8 char and less than 15 char",
+          message: "password must be greater than 8 char and less than 15 char",
         });
-    if (!validator.isStrongPassword(password))
-      return res
-        .status(400)
-        .send({
-          status: false,
-          message:
-            "plz enter valid password, must contain 1 Uppercase,1 Lowercase,1 special-character",
-        });
+    // if (!validator.isStrongPassword(password))
+    //   return res
+    //     .status(400)
+    //     .send({
+    //       status: false,
+    //       message:
+    //         "plz enter valid password, must contain 1 Uppercase,1 Lowercase,1 special-character",
+    //     });
 
     if (address) {
       if (typeof address === "object") {
@@ -116,10 +116,10 @@ const registerUser = async (req, res) => {
     let userData = { title, name, phone, email, password, address };
     let createUser = await userModel.create(userData);
     let { __v, ...otherData } = createUser._doc;
-    res.status(201).send({ status: true, message: "success", data: otherData });
+   return res.status(201).send({ status: true, message: "Success", data: otherData });
   } catch (error) {
     console.log("error in registerUser", error.message);
-    res.send(error.message);
+    res.status(500).send({message:error.message});
   }
 };
 
@@ -128,7 +128,7 @@ const loginUser = async (req, res) => {
     let data = req.body;
 
     if (Object.keys(data).length === 0)
-      return res.status(400).send({ message: "plz provide valid credentials" });
+      return res.status(400).send({status:false, message: "plz provide valid credentials" });
 
     let { email, password } = data;
 
@@ -143,10 +143,10 @@ const loginUser = async (req, res) => {
       return res
         .status(400)
         .send({ status: false, message: "password is missing" });
-    if (!validator.isStrongPassword(password))
-      return res
-        .status(400)
-        .send({ status: false, message: "Invalid password" });
+    // if (!validator.isStrongPassword(password))
+    //   return res
+    //     .status(400)
+    //     .send({ status: false, message: "Invalid password" });
 
     let findUser = await userModel.findOne({
       email: email,
@@ -161,12 +161,13 @@ const loginUser = async (req, res) => {
       expiresIn: 86400,
     });
 
-    res.setHeader("x-api-key", token);
-    res
+    // res.setHeader("x-api-key", token);
+   return res
       .status(200)
-      .send({ status: true, message: "Login scuccess", data: token });
+      .send({ status: true, message: "Success", data: token });
   } catch (error) {
     console.log("error in loginUser", error.message);
+    res.status(500).send({status:false,message:error.message})
   }
 };
 
