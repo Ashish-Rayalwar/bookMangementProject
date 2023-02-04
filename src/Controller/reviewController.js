@@ -103,7 +103,7 @@ const createReview = async function (req, res) {
 
     book.reviewsData = otherData;
 
-    res.status(201).send({ status: true, message: "Book List", data: book });
+    res.status(201).send({ status: true, message: "Books List", data: book });
   } catch (error) {
     return res.status(500).send({ status: false, message: error.message });
   }
@@ -114,7 +114,7 @@ const reviewUpdate = async function (req, res) {
     let data = req.body;
     const { rating, review, reviewedBy } = data;
 
-    if (Object.entries(data).length == 0) {
+    if (Object.keys(data).length == 0) {
       return res
         .status(400)
         .send({ status: false, message: "please provide some data" });

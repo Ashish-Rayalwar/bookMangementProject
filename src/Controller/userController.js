@@ -15,50 +15,20 @@ const registerUser = async (req, res) => {
 
     let { title, name, phone, email, password, address } = data;
 
-    if (!title)
-      return res
-        .status(400)
-        .send({ status: false, message: "Title is mendatory" });
-    if (!validTitle.includes(title))
-      return res
-        .status(400)
-        .send({ status: false, message: "plz provide valid title" });
+    if (!title) return res.status(400).send({ status: false, message: "Title is mendatory" });
+    if (!validTitle.includes(title)) return res.status(400).send({ status: false, message: "plz provide valid title" });
 
-    if (!name)
-      return res
-        .status(400)
-        .send({ status: false, message: "name is mendatory" });
-    if (!validator.isAlpha(name.split(" ").join("")))
-      return res
-        .status(400)
-        .send({ status: false, message: "plz enter valid name" });
+    if (!name) return res.status(400).send({ status: false, message: "name is mendatory" });
+    if (!validator.isAlpha(name.split(" ").join(""))) return res.status(400).send({ status: false, message: "plz enter valid name" });
 
-    if (!phone)
-      return res
-        .status(400)
-        .send({ status: false, message: "phone is mendatory" });
-    if (!validateMobile.test(phone))
-      return res
-        .status(400)
-        .send({ status: false, message: "plz enter valid mobile number" });
+    if (!phone) return res.status(400).send({ status: false, message: "phone is mendatory" });
+    if (!validateMobile.test(phone)) return res.status(400).send({ status: false, message: "plz enter valid mobile number" });
 
-    if (!email)
-      return res
-        .status(400)
-        .send({ status: false, message: "email is mendatory" });
-    if (!validator.isEmail(email.trim()))
-      return res
-        .status(400)
-        .send({ status: false, message: "plz enter valid email" });
+    if (!email) return res.status(400).send({ status: false, message: "email is mendatory" });
+    if (!validator.isEmail(email.trim())) return res.status(400).send({ status: false, message: "plz enter valid email" });
 
-    if (!password)
-      return res
-        .status(400)
-        .send({ status: false, message: "password is mendatory" });
-    if (password.length > 15 || password.length < 8)
-      return res
-        .status(400)
-        .send({
+    if (!password) return res.status(400).send({ status: false, message: "password is mendatory" });
+    if (password.length > 15 || password.length < 8)return res.status(400).send({
           status: false,
           message: "password must be greater than 8 char and less than 15 char",
         });
@@ -73,46 +43,33 @@ const registerUser = async (req, res) => {
 
     if (address) {
       if (typeof address === "object") {
-        if (Object.keys(address).length === 0)
-          return res
-            .status(400)
-            .send({
-              status: false,
-              message:
-                "plz send addresss details, otherwise remove address key",
-            });
+        if (Object.keys(address).length === 0)return res.status(400).send({status: false,message:"plz send addresss details, otherwise remove address key"});
 
-        {
-          let { pincode } = address;
+        
+          let { street,city,pincode} = address;
+          if(street){
+
+            if(!/^[A-Za-z0-9\s\-_,\.;:()]+$/.test(street)) return res.status(400).send({status: false,message: "street should be a valid alphabates."})
+          }
+          if(city){
+
+            if(!validator.isAlpha(city.split(" ").join(""))) return res.status(400).send({status: false,message: "city should be a valid alphabates."})
+          }
           if (pincode) {
-            if (!/^[^0][0-9]{2}[0-9]{3}$/.test(pincode)) {
-              return res
-                .status(400)
-                .send({
-                  status: false,
-                  message: "Pincode should be a valid pincode number.",
-                });
+            if (!/^[^0][0-9]{2}[0-9]{3}$/.test(pincode)) { return res.status(400).send({status: false,message: "Pincode should be a valid pincode number."});
             }
           }
-        }
+        
       } else {
-        return res
-          .status(400)
-          .send({ status: false, message: "Invalid type of address" });
+        return res.status(400).send({ status: false, message: "Invalid type of address" });
       }
     }
 
     let checkDublicateByPhone = await userModel.findOne({ phone: phone });
     let checkDublicateByEmail = await userModel.findOne({ email: email });
 
-    if (checkDublicateByPhone)
-      return res
-        .status(409)
-        .send({ status: false, message: "user alredy exist with this phone" });
-    if (checkDublicateByEmail)
-      return res
-        .status(409)
-        .send({ status: false, message: "user alredy exist with this email" });
+    if (checkDublicateByPhone)return res.status(400).send({ status: false, message: "user alredy exist with this phone" });
+    if (checkDublicateByEmail)return res.status(400).send({ status: false, message: "user alredy exist with this email" });
     let userData = { title, name, phone, email, password, address };
     let createUser = await userModel.create(userData);
     let { __v, ...otherData } = createUser._doc;
@@ -127,33 +84,26 @@ const loginUser = async (req, res) => {
   try {
     let data = req.body;
 
-    if (Object.keys(data).length === 0)
-      return res.status(400).send({status:false, message: "plz provide valid credentials" });
+    if (Object.keys(data).length === 0)return res.status(400).send({status:false, message: "plz provide valid credentials" });
 
-    let { email, password } = data;
-
-    if (!email)
-      return res
-        .status(400)
-        .send({ status: false, message: "email is missing" });
-    if (!validator.isEmail(email.trim()))
-      return res.status(400).send({ status: false, message: "Invalid email" });
-
-    if (!password)
-      return res
-        .status(400)
-        .send({ status: false, message: "password is missing" });
+    let { email, password, ...rest } = data;
+    email=email.trim()
+    if(Object.keys(rest).length>0) return res.status(401).send({ status: false, message: "Invalid credintials" });
+    if (!email) return res.status(400).send({ status: false, message: "email is missing" });
+    if (!validator.isEmail(email)) return res.status(401).send({ status: false, message: "Invalid email" });
+    password=password.trim()
+    if (!password) return res.status(400).send({ status: false, message: "password is missing" });
+    if (password.length > 15 || password.length < 8)return res.status(401).send({
+      status: false,
+      message: "password must be greater than 8 char and less than 15 char",
+    });
     // if (!validator.isStrongPassword(password))
     //   return res
     //     .status(400)
     //     .send({ status: false, message: "Invalid password" });
 
-    let findUser = await userModel.findOne({
-      email: email,
-      password: password,
-    });
-    if (!findUser)
-      return res.status(404).send({ status: false, message: "user not found" });
+    let findUser = await userModel.findOne({email: email,password: password});
+    if (!findUser) return res.status(404).send({ status: false, message: "user not found" });
 
     let userId = findUser._id.toString();
 
@@ -162,9 +112,7 @@ const loginUser = async (req, res) => {
     });
 
     // res.setHeader("x-api-key", token);
-   return res
-      .status(200)
-      .send({ status: true, message: "Success", data: token });
+   return res.status(200).send({ status: true, message: "Success", data: token });
   } catch (error) {
     console.log("error in loginUser", error.message);
     res.status(500).send({status:false,message:error.message})
