@@ -77,7 +77,7 @@ const createBook = async (req, res) => {
         .send({ status: false, message: "plz provide valid userId" });
     if (userId != req.tokenDetails.userId)
       return res
-        .status(400)
+        .status(404)
         .send({ status: false, message: "This userId is not exist in token" });
     let findBookbyISBN = await bookModel.findOne({ ISBN: ISBN });
     if (findBookbyISBN)
@@ -246,7 +246,7 @@ const getBookById = async function (req, res) {
     if (!bookData) return res.status(404).send({status:false, message: "no book found" });
 
     let booksReviews = await reviewModel.find({ bookId: bookId, isDeleted: false }).select({ createdAt: 0, updatedAt: 0, isDeleted: 0, __v: 0 });
-    if (booksReviews.length===0) return res.status(404).send({status:false, message: "no review found" });
+   
     bookData.booksReviews = booksReviews;
 
     res.status(200).send({ status: true, message: "Books List", data: bookData });
