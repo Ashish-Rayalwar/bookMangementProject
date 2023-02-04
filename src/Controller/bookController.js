@@ -188,7 +188,7 @@ const getBooks = async (req, res) => {
         
 
     let {userId,category,subcategory,...rest} = data
-   if(Object.keys(rest).length>0) return res.status(400).send({ status: false, message: "Invalid filter" });
+   if(Object.keys(rest).length>0) return res.status(404).send({ status: false, message: "Invalid filter" });
 
     if (userId) {
       if (!mongoose.isValidObjectId(userId))

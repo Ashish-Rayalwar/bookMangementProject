@@ -60,18 +60,19 @@ const createReview = async function (req, res) {
         .status(400)
         .send({ status: false, message: "rating is required" });
 
+        if (typeof rating != "number")
+          return res
+            .status(400)
+            .send({
+              status: false,
+              message: "invalid rating / rating must be innumber",
+            });
+            
     if (!(rating >= 1 && rating <= 5))
       return res
         .status(400)
         .send({ status: false, message: "rating should be in between 0 to 5" });
 
-    if (typeof rating != "number")
-      return res
-        .status(400)
-        .send({
-          status: false,
-          message: "invalid rating / rating must be innumber",
-        });
 
     if (review) {
       if (validator.isAlphanumeric(review))
@@ -131,6 +132,7 @@ const reviewUpdate = async function (req, res) {
         .status(400)
         .send({ status: false, message: "enter valid book id" });
     }
+
     if (rating < 1 || rating > 5)
       return res
         .status(400)
